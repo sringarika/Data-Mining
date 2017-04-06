@@ -12,7 +12,6 @@ public class knn {
    
    public String computeKnn(List<double[]> dtrain, List<double[]> dtest)  {
        Map<Double,Double> map1 = new HashMap<>();
-    //   Map<Double,Double> map2 = new HashMap<>();
 
        Double[] d  = new Double[dtrain.size()];
        for (int i = 0; i < dtest.size(); i++) {

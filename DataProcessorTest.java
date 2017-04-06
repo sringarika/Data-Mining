@@ -1,3 +1,5 @@
+package knn;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -9,8 +11,8 @@ import java.util.Map;
 
 public class DataProcessorTest {
 
-    public static void main(String[] args) {
-       String csvFile = "/Users/yiwang/Documents/YiWang/Ebiz/Task 11/task11a/attachments/trainProdSelection.csv";
+    public static List<double[]>  testSet() {
+       String csvFile = "testProdSelection.csv";
         BufferedReader br = null;
         String line= "";
         String csvSplitBy = ",";
@@ -180,6 +182,7 @@ public class DataProcessorTest {
             System.out.println("new data bean created： " + newList.get(i)[6]);
         }
         System.out.println("Whole data normalization completed");
+        return newList;
     }
 
     public static double getMaxValue(double[] array) {
