@@ -15,6 +15,22 @@ public class DataProcessor {
         String[] data;
         List<String[]> list = new ArrayList<String[]>();
 
+        //set up similarity matrix for customer type.
+        Map<String,Integer> customer_map =new HashMap<String,Integer>();
+        customer_map.put("student", 0);
+        customer_map.put("engineer", 1);
+        customer_map.put("librarian", 2);
+        customer_map.put("professor", 3);
+        customer_map.put("doctor", 4);
+
+        //set up similarity matrix for customer type.
+        Map<String,Integer> lifestyle_map =new HashMap<String,Integer>();
+        lifestyle_map.put("spend<<saving", 0);
+        lifestyle_map.put("spend<saving", 1);
+        lifestyle_map.put("spend>saving", 2);
+        lifestyle_map.put("spend>>saving", 3);
+
+
         try {
             br = new BufferedReader (new FileReader (csvFile));
             while( ( line = br.readLine () ) != null ) {
@@ -32,20 +48,20 @@ public class DataProcessor {
 
         //normalize vacation value
             // put vacation value into an array
-        float[] vacationRaw = new float[count];
+        double[] vacationRaw = new double[count];
         for (int i = 0 ; i < count; i++) {
-            //get value and then convert into a float
+            //get value and then convert into a double
             String v = list.get(i)[2];
-            float newV = Float.parseFloat(v);
+            double newV = Double.parseDouble(v);
             vacationRaw[i] = newV;
         }
             //get the max and min of Vacation array.
-        float maxVacation = getMaxValue(vacationRaw);
-        float minVacation = getMinValue(vacationRaw);
+        double maxVacation = getMaxValue(vacationRaw);
+        double minVacation = getMinValue(vacationRaw);
             //get normalized value for Vacation as an array.
-        float[] vacationNormalized = new float[count];
+        double[] vacationNormalized = new double[count];
         for (int i = 0; i < count; i ++) {
-            float norm = (vacationRaw[i] - minVacation) / (maxVacation - minVacation);
+            double norm = (vacationRaw[i] - minVacation) / (maxVacation - minVacation);
             vacationNormalized[i] = norm;
             System.out.println("normalized vacation " + i + " " + vacationNormalized[i]);
         }
@@ -54,20 +70,20 @@ public class DataProcessor {
 
         //normalize credit value
             // put credit value into an array
-        float[] creditRaw = new float[count];
+        double[] creditRaw = new double[count];
         for (int i = 0 ; i < count; i++) {
-            //get value and then convert into a float
+            //get value and then convert into a double
             String c = list.get(i)[3];
-            float newC = Float.parseFloat(c);
+            double newC = Double.parseDouble(c);
             creditRaw[i] = newC;
         }
             //get the max and min of Vacation array.
-        float maxCredit = getMaxValue(creditRaw);
-        float minCredit = getMinValue(creditRaw);
+        double maxCredit = getMaxValue(creditRaw);
+        double minCredit = getMinValue(creditRaw);
             //get normalized value for credit as an array.
-        float[] creditNormalized = new float[count];
+        double[] creditNormalized = new double[count];
         for (int i = 0; i < count; i ++) {
-            float norm = (creditRaw[i] - minCredit) / (maxCredit - minCredit);
+            double norm = (creditRaw[i] - minCredit) / (maxCredit - minCredit);
             creditNormalized[i] = norm;
             System.out.println("normalized credit " + i + " " + creditNormalized[i]);
         }
@@ -75,20 +91,20 @@ public class DataProcessor {
 
         //normalize salary value
             // put salary value into an array
-        float[] salaryRaw = new float[count];
+        double[] salaryRaw = new double[count];
         for (int i = 0 ; i < count; i++) {
-            //get value and then convert into a float
+            //get value and then convert into a double
             String s = list.get(i)[4];
-            float newS = Float.parseFloat(s);
+            double newS = Double.parseDouble(s);
             salaryRaw[i] = newS;
         }
             //get the max and min of Salary array.
-        float maxSalary = getMaxValue(salaryRaw);
-        float minSalary = getMinValue(salaryRaw);
+        double maxSalary = getMaxValue(salaryRaw);
+        double minSalary = getMinValue(salaryRaw);
             //get normalized value for credit as an array.
-        float[] salaryNormalized = new float[count];
+        double[] salaryNormalized = new double[count];
         for (int i = 0; i < count; i ++) {
-            float norm = (salaryRaw[i] - minSalary) / (maxSalary - minSalary);
+            double norm = (salaryRaw[i] - minSalary) / (maxSalary - minSalary);
             salaryNormalized[i] = norm;
             System.out.println("normalized salary " + i + " " + salaryNormalized[i]);
         }
@@ -96,20 +112,20 @@ public class DataProcessor {
 
         //normalize property value
         // put property value into an array
-        float[] propertyRaw = new float[count];
+        double[] propertyRaw = new double[count];
         for (int i = 0 ; i < count; i++) {
-            //get value and then convert into a float
+            //get value and then convert into a double
             String p = list.get(i)[5];
-            float newP = Float.parseFloat(p);
+            double newP = Double.parseDouble(p);
             propertyRaw[i] = newP;
         }
         //get the max and min of Property array.
-        float maxProperty = getMaxValue(propertyRaw);
-        float minProperty = getMinValue(propertyRaw);
+        double maxProperty = getMaxValue(propertyRaw);
+        double minProperty = getMinValue(propertyRaw);
         //get normalized value for credit as an array.
-        float[] propertyNormalized = new float[count];
+        double[] propertyNormalized = new double[count];
         for (int i = 0; i < count; i ++) {
-            float norm = (propertyRaw[i] - minProperty) / (maxProperty - minProperty);
+            double norm = (propertyRaw[i] - minProperty) / (maxProperty - minProperty);
             propertyNormalized[i] = norm;
             System.out.println("normalized property " + i + " " + propertyNormalized[i]);
         }
@@ -120,21 +136,37 @@ public class DataProcessor {
         // the above two steps are skipped here since it is zero across the board.
 
         //parse classifier label
-        float[] newLabel = new float[count];
+        double[] newLabel = new double[count];
         for (int i = 0 ; i < count; i++) {
-            //get value and then convert into a float
+            //get value and then convert into a double
             String l = list.get(i)[6];
-            float newL = Float.parseFloat(l.substring(1));
+            double newL = Double.parseDouble(l.substring(1));
             System.out.println(newL);
             newLabel[i] = newL;
         }
 
+        //convert customer type.
+        int[] customerConverted = new int[count];
+        for (int i = 0; i < count; i++) {
+            customerConverted[i] = customer_map.get(list.get(i)[0]);
+            System.out.println("convert customer " + i + " " + customerConverted[i]);
+        }
+        System.out.println("customer conversion completed");
+
+        //convert  lifestyle type.
+        int[] lifestyleConverted = new int[count];
+        for (int i = 0; i < count; i++) {
+            lifestyleConverted[i] = lifestyle_map.get(list.get(i)[1]);
+            System.out.println("convert lifestyle " + i + " " + lifestyleConverted[i]);
+        }
+        System.out.println("lifestyle conversion completed");
+
         //Generate new list for normalized data;
-        List<float[]> newList = new ArrayList<float[]>();
+        List<double[]> newList = new ArrayList<double[]>();
         for (int i = 0 ; i < count; i++) {
-            float[] newData = new float[7];
-            newData[0] = 0;
-            newData[1] = 0;
+            double[] newData = new double[7];
+            newData[0] = customerConverted[i];
+            newData[1] = lifestyleConverted[i];
             newData[2] = vacationNormalized[i];
             newData[3] = creditNormalized[i];
             newData[4] = salaryNormalized[i];
@@ -147,8 +179,8 @@ public class DataProcessor {
         System.out.println("Whole data normalization completed");
     }
 
-    public static float getMaxValue(float[] array) {
-        float max = array[0];
+    public static double getMaxValue(double[] array) {
+        double max = array[0];
         for (int i = 1; i < array.length; i ++) {
             if (array[i] > max) {
                 max = array[i];
@@ -158,8 +190,8 @@ public class DataProcessor {
         return max;
     }
 
-    public static float getMinValue(float[] array) {
-        float min = array[0];
+    public static double getMinValue(double[] array) {
+        double min = array[0];
         for (int i = 1; i < array.length; i ++) {
             if (array[i] < min) {
                 min = array[i];
