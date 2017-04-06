@@ -158,8 +158,8 @@ public class DataProcessor {
         //convert  lifestyle type.
         int[] lifestyleConverted = new int[count];
         for (int i = 0; i < count; i++) {
-    //        lifestyleConverted[i] = lifestyle_map.get(list.get(i)[1]);
-            System.out.println("convert lifestyle " + i + " " + lifestyleConverted[i]);
+            lifestyleConverted[i] = lifestyle_map.get(list.get(i)[1]);
+     //       System.out.println("convert lifestyle " + i + " " + lifestyleConverted[i]);
         }
     //    System.out.println("lifestyle conversion completed");
 

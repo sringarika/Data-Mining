@@ -41,10 +41,10 @@ public class DataProcessorTest {
             while( ( line = br.readLine () ) != null ) {
                 count++;
                 data = line.split(csvSplitBy);
-                System.out.println ("line " + count + ": " + data[0] + " " + data[1] + ".");
+          //      System.out.println ("line " + count + ": " + data[0] + " " + data[1] + ".");
                 list.add(data);
-                System.out.println ("list " + count + ": " + list.size() + ".");
-                System.out.println ("list " + count + ": " + list.get(count-1)[0] + ".");
+           //     System.out.println ("list " + count + ": " + list.size() + ".");
+            //    System.out.println ("list " + count + ": " + list.get(count-1)[0] + ".");
             }
 
         } catch  (IOException e) {
@@ -68,9 +68,9 @@ public class DataProcessorTest {
         for (int i = 0; i < count; i ++) {
             double norm = (vacationRaw[i] - minVacation) / (maxVacation - minVacation);
             vacationNormalized[i] = norm;
-            System.out.println("normalized vacation " + i + " " + vacationNormalized[i]);
+     //       System.out.println("normalized vacation " + i + " " + vacationNormalized[i]);
         }
-        System.out.println("Vacation value normalization completed");
+      //  System.out.println("Vacation value normalization completed");
 
 
         //normalize credit value
@@ -90,9 +90,9 @@ public class DataProcessorTest {
         for (int i = 0; i < count; i ++) {
             double norm = (creditRaw[i] - minCredit) / (maxCredit - minCredit);
             creditNormalized[i] = norm;
-            System.out.println("normalized credit " + i + " " + creditNormalized[i]);
+    //        System.out.println("normalized credit " + i + " " + creditNormalized[i]);
         }
-        System.out.println("Credit value normalization completed");
+     //   System.out.println("Credit value normalization completed");
 
         //normalize salary value
             // put salary value into an array
@@ -111,9 +111,9 @@ public class DataProcessorTest {
         for (int i = 0; i < count; i ++) {
             double norm = (salaryRaw[i] - minSalary) / (maxSalary - minSalary);
             salaryNormalized[i] = norm;
-            System.out.println("normalized salary " + i + " " + salaryNormalized[i]);
+    //        System.out.println("normalized salary " + i + " " + salaryNormalized[i]);
         }
-        System.out.println("Salary value normalization completed");
+    //    System.out.println("Salary value normalization completed");
 
         //normalize property value
         // put property value into an array
@@ -132,9 +132,9 @@ public class DataProcessorTest {
         for (int i = 0; i < count; i ++) {
             double norm = (propertyRaw[i] - minProperty) / (maxProperty - minProperty);
             propertyNormalized[i] = norm;
-            System.out.println("normalized property " + i + " " + propertyNormalized[i]);
+      //      System.out.println("normalized property " + i + " " + propertyNormalized[i]);
         }
-        System.out.println("Property value normalization completed");
+    //    System.out.println("Property value normalization completed");
 
         //normalize customer type -  symbolic data based on similarity matrix provided
         //normalize lifestyle -  symbolic data based on similarity matrix provided
@@ -154,17 +154,17 @@ public class DataProcessorTest {
         int[] customerConverted = new int[count];
         for (int i = 0; i < count; i++) {
             customerConverted[i] = customer_map.get(list.get(i)[0]);
-            System.out.println("convert customer " + i + " " + customerConverted[i]);
+     //       System.out.println("convert customer " + i + " " + customerConverted[i]);
         }
-        System.out.println("customer conversion completed");
+   //     System.out.println("customer conversion completed");
 
         //convert  lifestyle type.
         int[] lifestyleConverted = new int[count];
         for (int i = 0; i < count; i++) {
             lifestyleConverted[i] = lifestyle_map.get(list.get(i)[1]);
-            System.out.println("convert lifestyle " + i + " " + lifestyleConverted[i]);
+     //       System.out.println("convert lifestyle " + i + " " + lifestyleConverted[i]);
         }
-        System.out.println("lifestyle conversion completed");
+     //   System.out.println("lifestyle conversion completed");
 
         //Generate new list for normalized data;
         List<double[]> newList = new ArrayList<double[]>();
@@ -179,9 +179,9 @@ public class DataProcessorTest {
             //newData[6] = newLabel[i];
 
             newList.add(newData);
-            System.out.println("new data bean created： " + newList.get(i)[6]);
+        //    System.out.println("new data bean created： " + newList.get(i)[6]);
         }
-        System.out.println("Whole data normalization completed");
+      //  System.out.println("Whole data normalization completed");
         return newList;
     }
 
@@ -192,7 +192,7 @@ public class DataProcessorTest {
                 max = array[i];
             }
         }
-        System.out.println("max value of this array is " + max);
+  //      System.out.println("max value of this array is " + max);
         return max;
     }
 
@@ -203,7 +203,7 @@ public class DataProcessorTest {
                 min = array[i];
             }
         }
-        System.out.println("min value of this array is " + min);
+   //     System.out.println("min value of this array is " + min);
         return min;
     }
 }
