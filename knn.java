@@ -1,63 +1,83 @@
 package knn;
 import java.util.List;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.util.ArrayList;
+import java.util.Map;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 
-import weka.core.Instance;
-import weka.core.Instances;
 
-//import weka.core.converters.ConverterUtils.DataSource;
 
 public class knn {
    
-   public static void main(String[] args) throws Exception {
-       BufferedReader breader = null;
-       breader = new BufferedReader(new FileReader("trainProdSelection.arff"));
    
-    Instances train = new Instances(breader);
-    train.setClassIndex(train.numAttributes() - 1);
-    List<Instance> trainingSet = new ArrayList<Instance>();
-    int count = 1;
-    /*for(int i = 0; i < 185; i++) {
-        System.out.println(train.instance(i)); System.out.println(count++); } */
-   for(int i = 0; i < 185; i++) {
-        trainingSet.add(train.instance(i)); 
-   }
-  /* for(int i = 0; i < 185; i++) {
-       System.out.println(trainingSet.get(i)); System.out.println(count++); 
-       }*/
-    System.out.println(trainingSet.get(0));
-    breader.close();
+   public String computeKnn(List<double[]> dtrain, List<double[]> dtest)  {
+       Map<Double,Double> map1 = new HashMap<>();
+    //   Map<Double,Double> map2 = new HashMap<>();
 
-}
-   
-   public int computeKnn(List<double[]> dtrain, List<double[]> dtest)  {
-       int kvote = 1;
+       Double[] d  = new Double[dtrain.size()];
        for (int i = 0; i < dtest.size(); i++) {
-           double[] inverseDistanceArray = computeInverseEuclideanDistance(dtrain, dtest.get(i));
-           double[] arrayBackup = inverseDistanceArray.clone();
-           Arrays.sort(inverseDistanceArray);
-          System.arraycopy(inverseDistanceArray, 0, inverseDistanceArray, 0, 3);
-           
+           for (int j = 0;  j < dtrain.size(); j++) {
+               d[j] = computeEuclideanDistance(dtrain.get(j), dtest.get(i));
+               map1.put(d[j], dtrain.get(j)[dtrain.get(j).length-1]);
        }
-       return kvote;
+      
    }
-   public double[] computeInverseEuclideanDistance(List<double[]> a  , double[] b) {
-       double[] d = new double[a.size()]; 
+       Double[] sortedDistance = d.clone();
+       Arrays.sort(sortedDistance, Collections.reverseOrder());
+      System.arraycopy(sortedDistance, 0, sortedDistance, 0, 3);
+      
+      double c1 = map1.get(sortedDistance[0]);
+      double c2 = map1.get(sortedDistance[1]);
+      double c3 = map1.get(sortedDistance[2]);
+      
+     
+      if(c1 == c2 && c1 != c3) {
+          if((sortedDistance[0] + sortedDistance[1]) > sortedDistance[2]) {
+              return "C" + c1;
+          }
+          else {
+              return "C" + c3;
+          }
+      }
+      
+      if(c2 == c3 && c2 != c1) {
+          if((sortedDistance[1] + sortedDistance[2]) > sortedDistance[0]) {
+              return "C" + c2;
+          }
+          else {
+              return "C" + c1;
+          }
+      }
+
+      if(c1 == c3 && c1 != c2) {
+          if((sortedDistance[0] + sortedDistance[2]) > sortedDistance[1]) {
+              return "C" + c1;
+          }
+          else {
+              return "C" + c2;
+          }
+      }
+      else {
+          return "C" + c1;
+      }
+       
+   }
+   
+   
+   
+   public double computeEuclideanDistance(double[] a, double[] b) {
+       double d = 0; 
        double similarity;
        
        for(int i = 0; i < b.length; i++) {
-           for (int j = 0; j < a.size(); j++) {
               
                
                if (i >= 2) {
                    
-           d[j]+= Math.pow((a.get(j)[i] - b[i]),2);
+           d+= Math.pow((a[i] - b[i]),2);
                
                }else {
-                       if (a.get(j)[i] == b[i]) {
+                       if (a[i] == b[i]) {
                            similarity = 1;
                        
                        }else {
@@ -65,18 +85,15 @@ public class knn {
                            similarity = 0;
                        }
                   
-                       d[j]+= 1 - similarity;
-               }
-           
-             
-              d[j] = Math.sqrt(d[j]);
-              d[j] = 1.0/d[j];
+                       d+= 1 - similarity;
+               }       
            }
           
-       }
-       
+       d = Math.sqrt(d);
+       d = 1.0/d;
        
        return d;
    }
    
 }
+
