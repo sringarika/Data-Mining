@@ -7,10 +7,10 @@ import java.util.*;
 /**
  * Created by yiwang on 4/5/17.
  */
-public class DataProcessorB {
+public class DataProcessorBBinary {
 
     public static void main(String[] args) {
-        String csvFile = "/Users/yiwang/Documents/YiWang/Ebiz/Task 11/task11b/attachments/trainProdIntro.real.csv";
+        String csvFile = "/Users/yiwang/Documents/YiWang/Ebiz/Task 11/task11b/attachments/trainProdIntro.binary.csv";
         BufferedReader br = null;
         String line = "";
         String csvSplitBy = ",";
@@ -224,27 +224,6 @@ public class DataProcessorB {
         }
         System.out.println("Period normalization completed");
 
-        //normalize label value
-        // put label value into an array
-        double[] labelRaw = new double[count];
-        for (int i = 0 ; i < count; i++) {
-            //get value and then convert into a double
-            String l = list.get(i)[8];
-            double newL = Double.parseDouble(l);
-            labelRaw[i] = newL;
-        }
-        //get the max and min of Label array.
-        double maxLabel = getMaxValue(labelRaw);
-        double minLabel = getMinValue(labelRaw);
-        //get normalized value for Label as an array.
-        double[] labelNormalized = new double[count];
-        for (int i = 0; i < count; i ++) {
-            double norm = (labelRaw[i] - minLabel) / (maxLabel - minLabel);
-            labelNormalized[i] = norm;
-            System.out.println("normalized label " + i + " " + labelNormalized[i]);
-        }
-        System.out.println("Label normalization completed");
-
         //convert symbolic data-> not using 2d array yet, that is for KNN calculation
         //convert service type.
         int[] serviceConverted = new int[count];
@@ -290,7 +269,7 @@ public class DataProcessorB {
             newData[5] = promotionConverted[i];
             newData[6] = rateNormalized[i];
             newData[7] = periodNormalized[i];
-            newData[8] = labelNormalized[i];
+            newData[8] = Double.parseDouble(list.get(i)[8]);
 
             newList.add(newData);
             System.out.println("new data bean created： " + newList.get(i)[6]);

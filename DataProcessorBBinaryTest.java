@@ -1,16 +1,18 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
- * Created by yiwang on 4/5/17.
+ * Created by yiwang on 4/6/17.
  */
-public class DataProcessorB {
+public class DataProcessorBBinaryTest {
 
     public static void main(String[] args) {
-        String csvFile = "/Users/yiwang/Documents/YiWang/Ebiz/Task 11/task11b/attachments/trainProdIntro.real.csv";
+        String csvFile = "/Users/yiwang/Documents/YiWang/Ebiz/Task 11/task11b/attachments/testProdIntro.binary.csv";
         BufferedReader br = null;
         String line = "";
         String csvSplitBy = ",";
@@ -236,14 +238,14 @@ public class DataProcessorB {
         //get the max and min of Label array.
         double maxLabel = getMaxValue(labelRaw);
         double minLabel = getMinValue(labelRaw);
-        //get normalized value for Label as an array.
-        double[] labelNormalized = new double[count];
-        for (int i = 0; i < count; i ++) {
-            double norm = (labelRaw[i] - minLabel) / (maxLabel - minLabel);
-            labelNormalized[i] = norm;
-            System.out.println("normalized label " + i + " " + labelNormalized[i]);
-        }
-        System.out.println("Label normalization completed");
+//        //get normalized value for Label as an array.
+//        double[] labelNormalized = new double[count];
+//        for (int i = 0; i < count; i ++) {
+//            double norm = (labelRaw[i] - minLabel) / (maxLabel - minLabel);
+//            labelNormalized[i] = norm;
+//            System.out.println("normalized label " + i + " " + labelNormalized[i]);
+//        }
+//        System.out.println("Label normalization completed");
 
         //convert symbolic data-> not using 2d array yet, that is for KNN calculation
         //convert service type.
@@ -281,7 +283,7 @@ public class DataProcessorB {
         //generate new list for normalized/conversion.
         List<double[]> newList = new ArrayList<double[]>();
         for (int i = 0 ; i < count; i++) {
-            double[] newData = new double[9];
+            double[] newData = new double[8];
             newData[0] = serviceConverted[i];
             newData[1] = customerConverted[i];
             newData[2] = feeNormalized[i];
@@ -290,16 +292,12 @@ public class DataProcessorB {
             newData[5] = promotionConverted[i];
             newData[6] = rateNormalized[i];
             newData[7] = periodNormalized[i];
-            newData[8] = labelNormalized[i];
+            //newData[8] = labelNormalized[i];
 
             newList.add(newData);
             System.out.println("new data bean created： " + newList.get(i)[6]);
         }
         System.out.println("Whole data normalization completed");
-
-
-
-
     }
     public static double getMaxValue(double[] array) {
         double max = array[0];
