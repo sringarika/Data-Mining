@@ -13,7 +13,7 @@ public class ProjectBKNNBinary {
 
     public static void main(String[] args) {
         List<double[]> dtrain =GetNormalizedTrainData();
-        List<double[]> dtest = GetNormalizedTrainData();
+        List<double[]> dtest = GetNormalizedTestData();
         String[] result = ComputeKnn(dtrain, dtest);
 
         for (int i = 0; i < result.length; i ++) {
