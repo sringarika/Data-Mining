@@ -59,6 +59,13 @@ public class DecisionTree {
         selectionTrainDataPath = rootPath + "trainProdSelection.arff";
     }
 
+    public DecisionTree(int maxDepth) {
+        this.maxDepth = maxDepth;
+        selectionList = new ArrayList<>();
+        rootPath = new String("/Users/Flynn/Desktop/eBusiness/Task 11/");
+        selectionTrainDataPath = rootPath + "trainProdSelection.arff";
+    }
+
     public void loadSelectionTrainData() {
         try {
             FileInputStream fis = new FileInputStream(selectionTrainDataPath);
@@ -90,13 +97,16 @@ public class DecisionTree {
         }
     }
 
-    private boolean shouldTerminate(int depth, List<Selection> dataset) {
-        if (depth >= maxDepth) {
+    private boolean shouldTerminate(int depth, List<Selection> dataSet, Set<Integer> usedAttributes) {
+//        if (depth >= maxDepth) {
+//            return true;
+//        }
+        if (usedAttributes.size() == maxDepth) {
             return true;
         }
 
         Set<String> set = new HashSet<>();
-        for (Selection s : dataset) {
+        for (Selection s : dataSet) {
             set.add(s.getLabel());
         }
 
@@ -107,8 +117,9 @@ public class DecisionTree {
         return false;
     }
 
-    public void constructDecisionTree(List<Selection> selectionList, int depth, TreeNode root) {
-        if (shouldTerminate(depth, selectionList)) {
+    public void constructDecisionTree(List<Selection> selectionList, int depth, TreeNode root,
+                                      Set<Integer> usedAttributes) {
+        if (shouldTerminate(depth, selectionList, usedAttributes)) {
             Map<String, Integer> labelMap = new HashMap<>();
             for (Selection s : selectionList) {
                 if (!labelMap.containsKey(s.getLabel())) {
@@ -137,26 +148,33 @@ public class DecisionTree {
         double splitPoint = 0.0;
 
         for (int i = 1; i <= 2; i++) {
-            double EA = infoGain.getDiscreteEntropy(i);
-            double gainRatio = infoGain.getGainRatio(i, ES, EA);
+            if (!usedAttributes.contains(i)) {
+                double EA = infoGain.getDiscreteEntropy(i);
+                double gainRatio = ES - EA;
+                // double gainRatio = infoGain.getGainRatio(i, ES, EA);
 
-            if (gainRatio > maxGain) {
-                maxGain = gainRatio;
-                attribute = i;
+                if (gainRatio > maxGain) {
+                    maxGain = gainRatio;
+                    attribute = i;
+                }
             }
         }
 
         for (int i = 3; i <= 6; i++) {
-            InfoGain.NumericResult result = infoGain.getNumericEntropy(i);
-            double EA = result.EA;
-            double gainRatio = infoGain.getGainRatio(i, ES, EA);
+            if (!usedAttributes.contains(i)) {
+                InfoGain.NumericResult result = infoGain.getNumericEntropy(i);
+                double EA = result.EA;
+                double gainRatio = infoGain.getGainRatio(i, ES, EA);
 
-            if (gainRatio > maxGain) {
-                maxGain = gainRatio;
-                attribute = i;
-                splitPoint = result.spiltPoint;
+                if (gainRatio > maxGain) {
+                    maxGain = gainRatio;
+                    attribute = i;
+                    splitPoint = result.spiltPoint;
+                }
             }
         }
+        root.setAttribute(attribute);
+        usedAttributes.add(attribute);
 
         if (attribute <= 2) {
             Map<String, List<Selection>> valueMap = new HashMap<>();
@@ -182,12 +200,14 @@ public class DecisionTree {
             for (String key : valueMap.keySet()) {
                 TreeNode node = new TreeNode();
                 node.setDiscreteValue(key);
-                constructDecisionTree(valueMap.get(key), depth + 1, node);
+                constructDecisionTree(valueMap.get(key), depth + 1, node, usedAttributes);
                 root.getChildren().add(node);
             }
         } else {
             TreeNode leftNode = new TreeNode();
+            leftNode.setSplitPoint(splitPoint);
             TreeNode rightNode = new TreeNode();
+            rightNode.setSplitPoint(splitPoint);
             List<Selection> leftList = new ArrayList<>();
             List<Selection> rightList = new ArrayList<>();
             List<HelperPair> helperPairs = new ArrayList<>();
@@ -223,8 +243,8 @@ public class DecisionTree {
                 }
             }
 
-            constructDecisionTree(leftList, depth + 1, leftNode);
-            constructDecisionTree(rightList, depth + 1, rightNode);
+            constructDecisionTree(leftList, depth + 1, leftNode, usedAttributes);
+            constructDecisionTree(rightList, depth + 1, rightNode, usedAttributes);
             root.getChildren().add(leftNode);
             root.getChildren().add(rightNode);
         }
@@ -236,21 +256,46 @@ public class DecisionTree {
         }
 
         List<TreeNode> children = root.getChildren();
+        String discreteValue = null;
+        double numericValue = 0.0;
+        String ret = new String();
+
         switch (root.getAttribute()) {
             case 1:
+                discreteValue = s.getType();
                 break;
             case 2:
+                discreteValue = s.getLifeStyle();
                 break;
             case 3:
+                numericValue = s.getVacation();
                 break;
             case 4:
+                numericValue = s.geteCredit();
                 break;
             case 5:
+                numericValue = s.getSalary();
                 break;
             case 6:
+                numericValue = s.getProperty();
                 break;
         }
 
-        return "";
+        if (discreteValue == null) {
+            double judgement = children.get(0).getSplitPoint();
+            if (numericValue <= judgement) {
+                ret = getClassification(children.get(0), s);
+            } else {
+                ret = getClassification(children.get(1), s);
+            }
+        } else {
+            for (TreeNode child : children) {
+                if (discreteValue.equals(child.getDiscreteValue())) {
+                    ret = getClassification(child, s);
+                }
+            }
+        }
+
+        return ret;
     }
 }

@@ -63,7 +63,8 @@ public class TreeNode {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("Attribute: ").append(attribute).append(", Split Point: ").append(splitPoint)
+        sb.append("Attribute: ").append(attribute).append(", Discrete Value: ").append(discreteValue)
+                .append(", Split Point: ").append(splitPoint)
                 .append(", Label: ").append(label);
         return sb.toString();
     }
