@@ -10,10 +10,10 @@ public class ProjectACV {
 
     public static void main(String[] args) {
         double accuracy;
-        int folds =5;
+        int folds = 6;
         List<double[]> allData = GetNormalizedTrainData();
         allData = GetRandomizedOrder(allData);
-
+        List<Double> errors = new ArrayList<>();
         for (int i = 0; i < folds; i++) {
             List<double[]> dtrain = GetCVTrainData(allData,folds,i);
 //            for (int b = 0; b <  dtrain.size(); b++ ) {
@@ -21,29 +21,47 @@ public class ProjectACV {
 //            }
             List<double[]> dtest = GetCVTestData(allData,folds,i);
             double[] result = ComputeKnn(dtrain, dtest);
-            for (int b = 0; b < result.length; b++ ) {
-                System.out.println(result[b]);
-            }
+//            for (int b = 0; b < result.length; b++ ) {
+//                System.out.println(result[b]);
+//            }
 
 
-            int accurateNumber = 0;
+           // int accurateNumber = 0;
+            double error = 0;
             for (int a = 0; a < result.length; a++) {
                 if (result[a] == dtest.get(a)[6]) {
-                    System.out.println("Train prediction " + result[a] + " matches test data type " + + dtest.get(a)[0] + " with result " + dtest.get(a)[6]);
-                    accurateNumber++;
+                    System.out.println("Train prediction " + result[a] + " matches test data type " + + dtest.get(a)[6] + " with result " + dtest.get(a)[6]);
+                  //  accurateNumber++;
                 } else {
-                    System.out.println("Train prediction " + result[a] + " doesn't match test data type " + + dtest.get(a)[0] + " with result " + dtest.get(a)[6]);
+                    System.out.println("Train prediction " + result[a] + " doesn't match test data type " + + dtest.get(a)[6] + " with result " + dtest.get(a)[6]);
+                    ++error;
                 }
             }
 
-            accuracy = accurateNumber / result.length;
-            System.out.println("Train prediction accuracy is " + accuracy);
+            //accuracy = accurateNumber / result.length;
+            errors.add(error);
+           // System.out.println("Train prediction accuracy is " + accuracy);
+             System.out.println("Train prediction Error for fold " + i + " " + error);
+             
+
         }
+        
+        double sumError = 0;
+        for (int i = 0; i < errors.size(); i++) {
+            sumError = sumError + errors.get(i);
+        }
+        double averageErrorPercentage = sumError/allData.size() * 100;
+        double averageAccuracyPercentage = 100 - averageErrorPercentage;
+        System.out.println("Train prediction Average Error for 6 folds " + averageErrorPercentage);
+        System.out.println("Train prediction Average Accuracy for 6 folds " + averageAccuracyPercentage);
+
+
     }
 
 
     public static List<double[]> GetNormalizedTrainData () {
-        String csvFile = "/Users/yiwang/Documents/YiWang/Ebiz/Task 11/task11a/attachments/trainProdSelection.csv";
+        //String csvFile = "/Users/yiwang/Documents/YiWang/Ebiz/Task 11/task11a/attachments/trainProdSelection.csv";
+        String csvFile = "trainProdSelection.csv";
         BufferedReader br = null;
         String line= "";
         String csvSplitBy = ",";
@@ -245,17 +263,19 @@ public class ProjectACV {
             newList.add(i, trainData.get(i));
         }
         Collections.shuffle(newList);
-
+        System.out.println("Randomization completed");
         return newList;
+
     }
 
     public static List<double[]> GetCVTestData (List<double[]> allData, int folds, int order) {
         List<double[]> dtest = new ArrayList<>();
         int total = allData.size();
+        System.out.println(total);
         int startIndex = total / folds * (order);
         int endIndex = startIndex + total / folds;
-        System.out.println("total " + total);
-        System.out.println("order " + order);
+        //System.out.println("total " + total);
+        //System.out.println("order " + order);
         System.out.println("start index " + startIndex);
         System.out.println("end index " + endIndex);
         dtest = allData.subList(startIndex, endIndex);
@@ -272,15 +292,17 @@ public class ProjectACV {
         int total = allData.size();
         int startIndex = total / folds * (order);
         int endIndex = startIndex + total / folds;
-        System.out.println("total " + total);
-        System.out.println("order " + order);
-        System.out.println("start index " + startIndex);
-        System.out.println("end index " + endIndex);
+        //System.out.println("total " + total);
+        //System.out.println("order " + order);
+        //System.out.println("start index " + startIndex);
+        //System.out.println("end index " + endIndex);
         dstart = allData.subList(0, startIndex);
-        dend = allData.subList(startIndex, endIndex);
+        dend = allData.subList(endIndex, allData.size());
 
         dtrain.addAll(dstart);
+        //System.out.println("start size " + dstart.size());
         dtrain.addAll(dend);
+        //System.out.print("end size " + dend.size());
         System.out.println("train data size " + dtrain.size());
         return  dtrain;
     }
@@ -293,10 +315,17 @@ public class ProjectACV {
 
         Map<Double,Double> map1 = new HashMap<>();
 
+        System.out.println("train data size: " + dtrain.size());
+        System.out.println("test data size: "  + dtest.size());
+
+
         Double[] d  = new Double[dtrain.size()];
         for (int i = 0; i < dtest.size(); i++) {
             for (int j = 0;  j < dtrain.size(); j++) {
                 d[j] = ComputeEDistance(dtrain.get(j), dtest.get(i));
+//                System.out.print("e-distance: " + d[j]);
+//                System.out.print(" index " + (dtrain.get(j).length-1));
+//                System.out.println(" label: " + dtrain.get(j)[dtrain.get(j).length-1]);
                 map1.put(d[j], dtrain.get(j)[dtrain.get(j).length-1]);
             }
 
@@ -304,48 +333,39 @@ public class ProjectACV {
             Arrays.sort(sortedDistance, Collections.reverseOrder());
             System.arraycopy(sortedDistance, 0, sortedDistance, 0, 3);
 
-            double c1 = map1.get(sortedDistance[0]);
-            double c2 = map1.get(sortedDistance[1]);
-            double c3 = map1.get(sortedDistance[2]);
+            double[] dsum = new double[5];
 
+            Map<Integer,Double> labelList =new HashMap<Integer,Double>();
 
-            if(c1 == c2 && c1 != c3) {
-                if((sortedDistance[0] + sortedDistance[1]) > sortedDistance[2]) {
-                    result[i] =  c1;
-                    System.out.println("go here 01");
-                }
-                else {
-                    result[i] =  c3;
-                    System.out.println("go here 02");
+            for (int a = 0; a < 3; a++) {
+                String label = Double.toString(map1.get(sortedDistance[a]));
+                switch(label.charAt(0)) {
+                    case '1': dsum[0] += sortedDistance[a];break;
+                    case '2': dsum[1] += sortedDistance[a];break;
+                    case '3': dsum[2] += sortedDistance[a];break;
+                    case '4': dsum[3] += sortedDistance[a];break;
+                    case '5': dsum[4] += sortedDistance[a];break;
+                    default: System.out.println("no label");
                 }
             }
 
-            if(c2 == c3 && c2 != c1) {
-                if((sortedDistance[1] + sortedDistance[2]) > sortedDistance[0]) {
-                    result[i] =  c2;
-                    System.out.println("go here 03");
-                }
-                else {
-                    result[i] =  c1;
-                    System.out.println("go here 04");
-                }
-            }
+            labelList.put(1, dsum[0]);
+            labelList.put(2, dsum[1]);
+            labelList.put(3, dsum[2]);
+            labelList.put(4, dsum[3]);
+            labelList.put(5, dsum[4]);
 
-            if(c1 == c3 && c1 != c2) {
-                if((sortedDistance[0] + sortedDistance[2]) > sortedDistance[1]) {
-                    result[i] =  c1;
-                    System.out.println("go here 05");
-                }
-                else {
-                    result[i] =  c2;
-                    System.out.println("go here 06");
-                }
-            }
-            else {
-                result[i] = c1;
-            }
+
+            Arrays.sort(dsum);
+            result[i] = new Double(getKeyFromValue(labelList, dsum[4]).toString());
+
+
+
 
         }
+
+
+
 
         System.out.println("KNN Calculated");
         return result;
@@ -353,34 +373,90 @@ public class ProjectACV {
 
     }
 
-    public static double ComputeEDistance(double[] train, double[] test) {
-
-        double d = 0;
-        double similarity;
-
-        for(int i = 0; i < test.length; i++) {
-
-
-            if (i >= 2) {
-
-                d+= Math.pow((train[i] - test[i]),2);
-
-            }else {
-                if (test[i] == train[i]) {
-                    similarity = 1;
-
-                }else {
-
-                    similarity = 0;
-                }
-
-                d+= 1 - similarity;
+    public static Object getKeyFromValue(Map hm, Object value) {
+        for (Object o : hm.keySet()) {
+            if (hm.get(o).equals(value)) {
+                return o;
             }
         }
+        return null;
+    }
 
-        d = Math.sqrt(d);
-        d = 1.0/d;
+    public static double ComputeEDistance(double[] train, double[] test) {
 
-        return d;
+        //set up similarity matrix for customer type.
+        Map<String,Integer> customer_map =new HashMap<String,Integer>();
+        customer_map.put("student", 0);
+        customer_map.put("engineer", 1);
+        customer_map.put("librarian", 2);
+        customer_map.put("professor", 3);
+        customer_map.put("doctor", 4);
+        double[][] customerSim = new double[5][5];
+        customerSim[0][0] = 1;
+        customerSim[0][1] = 0;
+        customerSim[0][2] = 0;
+        customerSim[0][3] = 0;
+        customerSim[0][4] = 0;
+        customerSim[1][0] = 0;
+        customerSim[1][1] = 1;
+        customerSim[1][2] = 0;
+        customerSim[1][3] = 0;
+        customerSim[1][4] = 0;
+        customerSim[2][0] = 0;
+        customerSim[2][1] = 0;
+        customerSim[2][2] = 1;
+        customerSim[2][3] = 0;
+        customerSim[2][4] = 0;
+        customerSim[3][0] = 0;
+        customerSim[3][1] = 0;
+        customerSim[3][2] = 0;
+        customerSim[3][3] = 1;
+        customerSim[3][4] = 0;
+        customerSim[4][0] = 0;
+        customerSim[4][1] = 0;
+        customerSim[4][2] = 0;
+        customerSim[4][3] = 0;
+        customerSim[4][4] = 1;
+
+        //set up similarity matrix for customer type.
+        Map<String,Integer> lifestyle_map =new HashMap<String,Integer>();
+        lifestyle_map.put("spend<<saving", 0);
+        lifestyle_map.put("spend<saving", 1);
+        lifestyle_map.put("spend>saving", 2);
+        lifestyle_map.put("spend>>saving", 3);
+        double[][] lifestyleSim = new double[4][4];
+        lifestyleSim[0][0] = 1;
+        lifestyleSim[0][1] = 0;
+        lifestyleSim[0][2] = 0;
+        lifestyleSim[0][3] = 0;
+        lifestyleSim[1][0] = 0;
+        lifestyleSim[1][1] = 1;
+        lifestyleSim[1][2] = 0;
+        lifestyleSim[1][3] = 0;
+        lifestyleSim[2][0] = 0;
+        lifestyleSim[2][1] = 0;
+        lifestyleSim[2][2] = 1;
+        lifestyleSim[2][3] = 0;
+        lifestyleSim[3][0] = 0;
+        lifestyleSim[3][1] = 0;
+        lifestyleSim[3][2] = 0;
+        lifestyleSim[3][3] = 1;
+
+
+        double distanceSum = 0;
+        //calculate similarity for customer
+        distanceSum = 1 - customerSim[(int)train[0]][(int)test[0]];
+        //calculate similarity for lifestyle
+        distanceSum += 1 - lifestyleSim[(int)train[1]][(int)test[1]];
+
+        for (int i = 2; i < 6; i++ ) {
+            distanceSum += Math.pow((train[i]-test[i]), 2);
+        }
+        distanceSum = Math.sqrt(distanceSum);
+        double distance = 1 / distanceSum;
+
+
+
+        return distance;
     }
 }
