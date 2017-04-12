@@ -18,36 +18,48 @@ public class ProjectAWeighted {
         double initialRate = Prediction(allData, DEFAULTWEIGHT, 5);
         double temp = initialRate;
         double newRate = 0;
-        System.out.println("initial rate : " + initialRate);
+        //System.out.println("initial rate : " + initialRate);
 
-        for (int i = 1; i < 201; i ++) {
-            updatedRate[0] = i/100;
-            //System.out.println("weight 1 : " + (double)i/100);
-                for (int a = 1; a < 201; a++) {
-                    updatedRate[1] = a / 100;
-                    for (int b = 1; b < 201; b++) {
-                        updatedRate[2] = b / 100;
-                            for (int c = 1; c < 201; c ++) {
-                                updatedRate[3] = c / 100;
-                                    for (int d = 1; d < 201; d++ ) {
-                                        updatedRate[4] = d / 100;
-                                        for (int e = 1; e < 201; e++ ) {
-                                            updatedRate[5] = e / 100;
-                                                newRate = Prediction(allData, updatedRate, 5);
-                                                if (newRate > temp) {
-                                                    temp = newRate;
-                                                    System.out.println("rate: " + temp);
-                                                }
-                                        }
-                                    }
-                            }
-                    }
-                }
+        double[] possibleWeights = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
+        List<double[]> weightList = GetCombinations(6, possibleWeights);
+//        for (int a = 0; a < weightList.size(); a++) {
+//            System.out.println("{" + weightList.get(a)[0] + "," +
+//                    weightList.get(a)[1] + "," +
+//                    weightList.get(a)[2] + "," +
+//                    weightList.get(a)[3] + "," +
+//                    weightList.get(a)[4] + "," +
+//                    weightList.get(a)[5] + "}");
+//        }
+
+        double[] rateList = new double[weightList.size()];
+        for (int b = 0; b < weightList.size(); b++) {
+            rateList[b] = Prediction(allData, weightList.get(b),5);
+            System.out.println("rate: " + rateList[b]);
         }
+
+
 
 
     }
 
+
+    public static List<double[]> GetCombinations(int n, double[] arr) {
+        int allCombinations = (int) Math.pow(arr.length, n);
+        List<double[]> weightCombinations = new ArrayList<double[]>();
+        for (int i = 0; i < allCombinations; i++) {
+            weightCombinations.add(new double[n]);
+        }
+
+        for (int a = 0; a < n; a++) {
+            int period = (int) Math.pow(arr.length, n - a -1);
+            for (int b = 0; b < allCombinations; b++) {
+                double[] thisCombination = weightCombinations.get(b);
+                int index = b / period % arr.length;
+                thisCombination[a] = arr [index];
+            }
+        }
+        return weightCombinations;
+    }
 
     public static double Prediction(List<double[]> allData, double[] w, int folds) {
         double[] accuracy = new double[folds];
@@ -71,7 +83,7 @@ public class ProjectAWeighted {
                 if (result[a] == dtest.get(a)[6]) {
                     //System.out.println("Train prediction " + result[a] + " matches test data type " + + dtest.get(a)[0] + " with result " + dtest.get(a)[6]);
                     accurateNumber++;
-                    accuracy[i] = (double)accurateNumber / 37;
+                    accuracy[i] = (double)accurateNumber / result.length;
                     //System.out.println("Train prediction " + accurateNumber);
                 } else {
                     //System.out.println("Train prediction " + result[a] + " doesn't match test data type " + + dtest.get(a)[0] + " with result " + dtest.get(a)[6]);
@@ -391,30 +403,43 @@ public class ProjectAWeighted {
             labelList.put(5, dsum[4]);
             //System.out.println("label 5: " + dsum[4]);
 
-            double max = dsum[0];
-            int index = 0;
-            for(int e = 1; e < dsum.length; e++) {
-                if(dsum[e] > max) {
-                    max = dsum[e];
-                    index = e+1;
-                } else {
-                    index = 1;
-                }
-            }
 
-            result[i] = index;
-            //System.out.println("result label " + result[i]);
+
+            Arrays.sort(dsum);
+            result[i] = new Double(getKeyFromValue(labelList, dsum[4]).toString());
+
+//            double max = dsum[0];
+//            int index = 0;
+//            for(int e = 1; e < dsum.length; e++) {
+//                if(dsum[e] > max) {
+//                    max = dsum[e];
+//                    index = e+1;
+//                } else {
+//                    index = 1;
+//                }
+//            }
+//
+//            result[i] = index;
+//            //System.out.println("result label " + result[i]);
         }
 
 
 
 
-        System.out.println("KNN Calculated");
+        //System.out.println("KNN Calculated");
         return result;
 
 
     }
 
+    public static Object getKeyFromValue(Map hm, Object value) {
+        for (Object o : hm.keySet()) {
+            if (hm.get(o).equals(value)) {
+                return o;
+            }
+        }
+        return null;
+    }
 
     public static double ComputeEDistance(double[] test, double[] train, double[] w) {
 
