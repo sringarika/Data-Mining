@@ -4,6 +4,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Created by Flynn on 04/04/2017.
@@ -38,21 +39,23 @@ public class InfoGain {
     public class NumericResult {
         public double spiltPoint;
         public double EA;
+        public String splitLabel;
 
-        public NumericResult (double spiltPoint, double EA) {
+        public NumericResult (double spiltPoint, double EA, String splitLabel) {
             this.spiltPoint = spiltPoint;
             this.EA = EA;
+            this.splitLabel = splitLabel;
         }
     }
 
-    private List<Selection> selectionList;
+//    private List<Selection> selectionList;
     public double numericSplit;
 
-    public InfoGain(List<Selection> selectionList) {
-        this.selectionList = selectionList;
-    }
+//    public InfoGain(List<Selection> selectionList) {
+//        this.selectionList = selectionList;
+//    }
 
-    public double getSampleEntropy() {
+    public double getSampleEntropy(List<Selection> selectionList) {
         double sum = 0.0;
         Map<String, Integer> map = new HashMap<>();
 
@@ -85,7 +88,7 @@ public class InfoGain {
         smallMap.put(label, smallMap.get(label) + 1);
     }
 
-    public double getDiscreteEntropy(int attribute) {
+    public double getDiscreteEntropy(int attribute, List<Selection> selectionList) {
         double sum = 0.0;
         Map<String, Map<String, Integer>> bigMap = new HashMap<>();
 
@@ -130,10 +133,12 @@ public class InfoGain {
 //        smallMap.put(s.getLabel(), smallMap.get(s.getLabel()) + 1);
 //    }
 
-    public NumericResult getNumericEntropy(int attribute) {
-        double sum = 0.0;
+    public NumericResult getNumericEntropy(int attribute, List<Selection> selectionList) {
+        // System.out.println(selectionList.size());
+        double sum;
         double max = (double) Integer.MIN_VALUE;
-        double splitPoit = 0.0;
+        double splitPoint = (double) Integer.MIN_VALUE;
+        String splitLabel = new String();
 
         List<NumericPair> pairList = new ArrayList<>();
         switch(attribute) {
@@ -173,6 +178,17 @@ public class InfoGain {
             }
         });
 
+        Map<Double, Map<String, Integer>> bigMap = new TreeMap<>();
+        for (NumericPair pair : pairList) {
+            if (!bigMap.containsKey(pair.value)) {
+                bigMap.put(pair.value, new TreeMap<>());
+            }
+            Map<String, Integer> smallMap = bigMap.get(pair.value);
+            if (!smallMap.containsKey(pair.lable)) {
+                smallMap.put(pair.lable, 0);
+            }
+            smallMap.put(pair.lable, smallMap.get(pair.lable) + 1);
+        }
         Map<String, Integer> rightMap = new HashMap<>();
         for (Selection s : selectionList) {
             if (!rightMap.containsKey(s.getLabel())) {
@@ -185,40 +201,53 @@ public class InfoGain {
             leftMap.put(key, 0);
         }
 
-        for (int i = 0; i < pairList.size() - 1; i++) {
-            NumericPair pair = pairList.get(i);
-            leftMap.put(pair.lable, leftMap.get(pair.lable) + 1);
-            rightMap.put(pair.lable, rightMap.get(pair.lable) - 1);
+        int index = 0;
+        double leftTotal = 0.0, rightTotal = selectionList.size();
+        for (Double d : bigMap.keySet()) {
+            if (index++ < bigMap.size() - 1) {
+                Map<String, Integer> smallMap = bigMap.get(d);
+                for (String s : smallMap.keySet()) {
+                    int count = smallMap.get(s);
 
-            double leftSum = 0.0;
-            for (String key : leftMap.keySet()) {
-                if (leftMap.get(key) > 0) {
-                    double p = ((double)leftMap.get(key) / (i + 1));
-                    leftSum -= (p * (Math.log(p) / Math.log(2)));
+                    leftMap.put(s, leftMap.get(s) + count);
+                    leftTotal += count;
+                    rightMap.put(s, rightMap.get(s) - count);
+                    rightTotal -= count;
+
+                    double leftSum = 0.0;
+                    for (String key : leftMap.keySet()) {
+                        if (leftMap.get(key) > 0) {
+                            double p = ((double) leftMap.get(key) / (leftTotal));
+                            leftSum -= (p * (Math.log(p) / Math.log(2)));
+                        }
+                    }
+                    leftSum *= ((double) (leftTotal) / selectionList.size());
+
+                    double rightSum = 0.0;
+                    for (String key : rightMap.keySet()) {
+                        if (rightMap.get(key) > 0) {
+                            double p = ((double) rightMap.get(key) / (rightTotal));
+                            rightSum -= (p * (Math.log(p) / Math.log(2)));
+                        }
+                    }
+                    rightSum *= ((double) (rightTotal) / selectionList.size());
+
+                    sum = leftSum + rightSum;
+                    // System.out.println("leftsum: " + leftSum + " rightsum: " + rightSum);
+                    if (sum > max) {
+                        max = sum;
+                        splitPoint = d;
+                        splitLabel = s;
+                    }
                 }
-            }
-            leftSum *= ((i + 1.0) / selectionList.size());
-
-            double rightSum = 0.0;
-            for (String key : rightMap.keySet()) {
-                if (rightMap.get(key) > 0) {
-                    double p = ((double)leftMap.get(key) / (selectionList.size() - 1 - i));
-                    rightSum -= (p * (Math.log(p) / Math.log(2)));
-                }
-            }
-            rightSum *= ((selectionList.size() - 1.0 - i) / selectionList.size());
-
-            sum = leftSum + rightSum;
-            if (sum > max) {
-                max = sum;
-                splitPoit = pairList.get(i).value;
             }
         }
 
-        return new NumericResult(splitPoit, max);
+        // System.out.println("point: " + splitPoint + " label: " + splitLabel);
+        return new NumericResult(splitPoint, max, splitLabel);
     }
 
-    private double getSplitInfo(int attribute) {
+    private double getSplitInfo(int attribute, List<Selection> selectionList) {
         double sum = 0.0;
         Map<String, Integer> map = new HashMap<>();
         switch (attribute) {
@@ -285,8 +314,8 @@ public class InfoGain {
         return sum;
     }
 
-    public double getGainRatio(int attribute, double ES, double EA) {
-        double splitInfo = getSplitInfo(attribute);
+    public double getGainRatio(int attribute, double ES, double EA, List<Selection> selectionList) {
+        double splitInfo = getSplitInfo(attribute, selectionList);
         double infoGain = ES - EA;
         return infoGain / splitInfo;
     }

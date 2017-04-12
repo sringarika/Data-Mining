@@ -17,6 +17,7 @@ public class Test {
     private static List<Selection> selectionList;
     private static List<Selection> selectionTrainData;
     private static List<Selection> selectionTestData;
+    private static final int TIMES = 5;
 
     public static void loadData() {
         try {
@@ -54,7 +55,7 @@ public class Test {
         selectionTestData = new ArrayList<>();
         selectionTrainData = new ArrayList<>();
         Set<Integer> testIndex = new HashSet<>();
-        int testSize = selectionList.size() / 5;
+        int testSize = selectionList.size() / TIMES;
         int length = selectionList.size();
         while (testIndex.size() < testSize) {
             int index = (int) (Math.random() * length);
@@ -73,37 +74,27 @@ public class Test {
 
     public static void main(String[] args) {
         loadData();
-        formTrainTestData();
-        DecisionTree dt = new DecisionTree(5);
+        DecisionTree dt = new DecisionTree(100);
         TreeNode root = new TreeNode();
         dt.constructDecisionTree(selectionList, 0, root, new HashSet<>());
-
-        Queue<TreeNode> queue = new LinkedList<>();
-        queue.add(root);
-        while (!queue.isEmpty()) {
-            int size = queue.size();
-            for (int i = 0; i < size; i++) {
-                TreeNode node = queue.poll();
-                System.out.println(node);
-                for (TreeNode child : node.getChildren()) {
-                    queue.add(child);
+        double sum = 0.0;
+        for (int i = 0; i < TIMES; i++) {
+            formTrainTestData();
+            int correct = 0, wrong = 0, total = 0;
+            for (Selection s : selectionTestData) {
+                total++;
+                String label = dt.getClassification(root, s);
+                if (label.equals(s.getLabel())) {
+                    correct++;
+                } else {
+                    wrong++;
                 }
             }
-            System.out.println("-----------------------------------------------------------");
+            double correctRatio = ((double) correct) / total;
+            sum += correctRatio * correctRatio;
         }
-        int correct = 0, wrong = 0, total = 0;
-        System.out.println("All: " + selectionList.size());
-        for (Selection s : selectionTestData) {
-            total++;
-            String label = dt.getClassification(root, s);
-            if (label.equals(s.getLabel())) {
-                correct++;
-            } else {
-                wrong++;
-            }
-        }
-        System.out.println("Correct:" + correct + ", Wrong: " + wrong + ", Total:" + total);
-        double correctRatio = ((double) correct) / total;
-        System.out.println(correctRatio);
+        sum /= TIMES;
+        sum = Math.sqrt(sum);
+        System.out.println("Accuracy: " + sum);
     }
 }

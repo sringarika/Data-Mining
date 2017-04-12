@@ -98,13 +98,16 @@ public class DecisionTree {
     }
 
     private boolean shouldTerminate(int depth, List<Selection> dataSet, Set<Integer> usedAttributes) {
-//        if (depth >= maxDepth) {
-//            return true;
-//        }
-        if (usedAttributes.size() == maxDepth) {
+        if (depth >= maxDepth) {
             return true;
         }
+//        if (usedAttributes.size() == maxDepth) {
+//            return true;
+//        }
 
+//        if (dataSet.size() <= 2) {
+//            return true;
+//        }
         Set<String> set = new HashSet<>();
         for (Selection s : dataSet) {
             set.add(s.getLabel());
@@ -141,17 +144,18 @@ public class DecisionTree {
             return;
         }
 
-        InfoGain infoGain = new InfoGain(selectionList);
-        double ES = infoGain.getSampleEntropy();
+        InfoGain infoGain = new InfoGain();
+        double ES = infoGain.getSampleEntropy(selectionList);
         double maxGain = (double) Integer.MIN_VALUE;
         int attribute = 0;
         double splitPoint = 0.0;
+        String splitLabel = new String();
 
         for (int i = 1; i <= 2; i++) {
             if (!usedAttributes.contains(i)) {
-                double EA = infoGain.getDiscreteEntropy(i);
+                double EA = infoGain.getDiscreteEntropy(i, selectionList);
                 double gainRatio = ES - EA;
-                // double gainRatio = infoGain.getGainRatio(i, ES, EA);
+                // double gainRatio = infoGain.getGainRatio(i, ES, EA, selectionList);
 
                 if (gainRatio > maxGain) {
                     maxGain = gainRatio;
@@ -161,20 +165,25 @@ public class DecisionTree {
         }
 
         for (int i = 3; i <= 6; i++) {
-            if (!usedAttributes.contains(i)) {
-                InfoGain.NumericResult result = infoGain.getNumericEntropy(i);
+            // if (!usedAttributes.contains(i)) {
+                InfoGain.NumericResult result = infoGain.getNumericEntropy(i, selectionList);
                 double EA = result.EA;
-                double gainRatio = infoGain.getGainRatio(i, ES, EA);
+                double gainRatio = ES - EA;
+                // double gainRatio = infoGain.getGainRatio(i, ES, EA, selectionList);
 
                 if (gainRatio > maxGain) {
                     maxGain = gainRatio;
                     attribute = i;
                     splitPoint = result.spiltPoint;
+                    splitLabel = result.splitLabel;
                 }
-            }
+            // }
         }
         root.setAttribute(attribute);
-        usedAttributes.add(attribute);
+        // System.out.println("point: " + splitPoint + " label: " + splitLabel);
+        if (attribute <= 2) {
+            usedAttributes.add(attribute);
+        }
 
         if (attribute <= 2) {
             Map<String, List<Selection>> valueMap = new HashMap<>();
@@ -236,8 +245,14 @@ public class DecisionTree {
             }
 
             for (HelperPair pair : helperPairs) {
-                if (pair.numeric <= splitPoint) {
+                if (pair.numeric < splitPoint) {
                     leftList.add(pair.selection);
+                } else if (pair.numeric == splitPoint) {
+                    if (pair.selection.getLabel().compareTo(splitLabel) <= 0) {
+                        leftList.add(pair.selection);
+                    } else {
+                        rightList.add(pair.selection);
+                    }
                 } else {
                     rightList.add(pair.selection);
                 }

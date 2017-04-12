@@ -8,16 +8,18 @@ public class TreeNode {
     private int attribute;
     private String discreteValue;
     private double splitPoint;
+    private String splitLabel;
     private List<TreeNode> children;
     private String label;
 
     public TreeNode() {
         children = new ArrayList<>();
     }
-    public TreeNode(int attribute, double splitPoint, List<TreeNode> children, String label) {
+    public TreeNode(int attribute, double splitPoint, String splitLabel, List<TreeNode> children, String label) {
         this.attribute = attribute;
         this.splitPoint = splitPoint;
         this.children = children;
+        this.splitLabel = splitLabel;
     }
 
     public String getLabel() {
@@ -58,6 +60,14 @@ public class TreeNode {
 
     public void setDiscreteValue(String discreteValue) {
         this.discreteValue = discreteValue;
+    }
+
+    public String getSplitLabel() {
+        return splitLabel;
+    }
+
+    public void setSplitLabel(String splitLabel) {
+        this.splitLabel = splitLabel;
     }
 
     @Override

@@ -12,6 +12,10 @@ public class Introduction {
     private double period;
     private String label;
 
+    public Introduction() {
+
+    }
+
     public Introduction(String serviceType, String customer, double monthlyFee, double advertisementBudget,
                         String size, String promotion, double interestRate, double period, String label) {
         this.serviceType = serviceType;
