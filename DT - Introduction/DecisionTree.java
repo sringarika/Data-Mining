@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.StreamSupport;
 
 /**
  * Created by Flynn on 04/04/2017.
@@ -19,7 +18,7 @@ public class DecisionTree {
     private String rootPath;
     private String introductionTrainDataPath;
     private Map<Integer, Integer> usageMap;
-    private final int MAX_USAGE = 20;
+    private final int MAX_USAGE = 25;
 
     public class HelperPair {
         public String discrete;

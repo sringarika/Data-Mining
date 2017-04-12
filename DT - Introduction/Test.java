@@ -3,26 +3,24 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 import java.util.Set;
 
 /**
  * Created by Flynn on 04/04/2017.
  */
 public class Test {
-    public static String rootPath = "/Users/Flynn/Desktop/eBusiness/Task 11/";
-    public static String testPath = "trainProdSelection.arff";
-    private static List<Selection> selectionList;
-    private static List<Selection> selectionTrainData;
-    private static List<Selection> selectionTestData;
+    // public static String rootPath = "/Users/Flynn/Desktop/eBusiness/Task 11/";
+    public static String filePath;
+    private static List<Introduction> introductionList;
+    private static List<Introduction> trainData;
+    private static List<Introduction> testData;
     private static final int TIMES = 5;
 
     public static void loadData() {
         try {
-            selectionList = new ArrayList<>();
-            FileInputStream fis = new FileInputStream(rootPath + testPath);
+            introductionList = new ArrayList<>();
+            FileInputStream fis = new FileInputStream(filePath);
             InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
             BufferedReader br = new BufferedReader(isr);
             String line;
@@ -31,17 +29,19 @@ public class Test {
                 if (line.length() > 0) {
                     if (line.indexOf("@") == -1) {
                         String[] parts = line.split(",");
-                        if (parts.length == 7) {
-                            Selection s = new Selection();
-                            s.setType(parts[0]);
-                            s.setLifeStyle(parts[1]);
-                            s.setVacation(Double.parseDouble(parts[2]));
-                            s.seteCredit(Double.parseDouble(parts[3]));
-                            s.setSalary(Double.parseDouble(parts[4]));
-                            s.setProperty(Double.parseDouble(parts[5]));
-                            s.setLabel(parts[6]);
+                        if (parts.length == 9) {
+                            Introduction introduction = new Introduction();
+                            introduction.setServiceType(parts[0]);
+                            introduction.setCustomer(parts[1]);
+                            introduction.setMonthlyFee(Double.parseDouble(parts[2]));
+                            introduction.setAdvertisementBudget(Double.parseDouble(parts[3]));
+                            introduction.setSize(parts[4]);
+                            introduction.setPromotion(parts[5]);
+                            introduction.setInterestRate(Double.parseDouble(parts[6]));
+                            introduction.setPeriod(Double.parseDouble(parts[7]));
+                            introduction.setLabel(parts[8]);
 
-                            selectionList.add(s);
+                            introductionList.add(introduction);
                         }
                     }
                 }
@@ -52,36 +52,38 @@ public class Test {
     }
 
     private static void formTrainTestData() {
-        selectionTestData = new ArrayList<>();
-        selectionTrainData = new ArrayList<>();
+        testData = new ArrayList<>();
+        trainData = new ArrayList<>();
         Set<Integer> testIndex = new HashSet<>();
-        int testSize = selectionList.size() / TIMES;
-        int length = selectionList.size();
+        int testSize = introductionList.size() / TIMES;
+        int length = introductionList.size();
         while (testIndex.size() < testSize) {
             int index = (int) (Math.random() * length);
             if (!testIndex.contains(index)) {
                 testIndex.add(index);
-                selectionTestData.add(selectionList.get(index));
+                testData.add(introductionList.get(index));
             }
         }
 
         for (int i = 0; i < length; i++) {
             if (!testIndex.contains(i)) {
-                selectionTrainData.add(selectionList.get(i));
+                trainData.add(introductionList.get(i));
             }
         }
     }
 
     public static void main(String[] args) {
+        filePath = args[0];
         loadData();
-        DecisionTree dt = new DecisionTree(100);
-        TreeNode root = new TreeNode();
-        dt.constructDecisionTree(selectionList, 0, root, new HashSet<>());
         double sum = 0.0;
         for (int i = 0; i < TIMES; i++) {
             formTrainTestData();
+            DecisionTree dt = new DecisionTree(50);
+            TreeNode root = new TreeNode();
+            dt.constructDecisionTree(introductionList, 0, root, new HashSet<>());
             int correct = 0, wrong = 0, total = 0;
-            for (Selection s : selectionTestData) {
+
+            for (Introduction s : testData) {
                 total++;
                 String label = dt.getClassification(root, s);
                 if (label.equals(s.getLabel())) {
@@ -90,7 +92,9 @@ public class Test {
                     wrong++;
                 }
             }
+            System.out.println("Correct:" + correct + ", Wrong: " + wrong + ", Total:" + total);
             double correctRatio = ((double) correct) / total;
+            System.out.println(correctRatio);
             sum += correctRatio * correctRatio;
         }
         sum /= TIMES;
