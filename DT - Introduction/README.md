@@ -1,2 +1,7 @@
 How to run decision tree:
-java Test "/absolute/path/of/your/train/product/introduction/binary/file"
+
+1. cd into this folder
+
+2. javac *.java
+
+3. java Test "/absolute/path/of/your/train/product/introduction/binary/file"
