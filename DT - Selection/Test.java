@@ -1,6 +1,7 @@
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -24,7 +25,8 @@ public class Test {
             BufferedReader br = new BufferedReader(isr);
             String line;
 
-            while ((line = br.readLine().trim()) != null) {
+            while ((line = br.readLine()) != null) {
+                line = line.trim();
                 if (line.length() > 0) {
                     if (line.indexOf("@") == -1) {
                         String[] parts = line.split(",");
@@ -93,6 +95,6 @@ public class Test {
         }
         sum /= TIMES;
         sum = Math.sqrt(sum);
-        System.out.println("Accuracy: " + sum);
+        System.out.println("Accuracy rate: " + sum);
     }
 }

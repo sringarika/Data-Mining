@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.io.*;
 
 /**
  * Created by Flynn on 04/04/2017.
@@ -25,7 +26,8 @@ public class Test {
             BufferedReader br = new BufferedReader(isr);
             String line;
 
-            while ((line = br.readLine().trim()) != null) {
+            while ((line = br.readLine()) != null) {
+                line = line.trim();
                 if (line.length() > 0) {
                     if (line.indexOf("@") == -1) {
                         String[] parts = line.split(",");
@@ -46,8 +48,12 @@ public class Test {
                     }
                 }
             }
-        } catch (Exception ex) {
+        } catch (FileNotFoundException ex) {
             System.out.println(ex.getMessage());
+        } catch (UnsupportedEncodingException ex) {
+           System.out.println(ex.getMessage());
+        } catch (IOException ex) {
+           System.out.println(ex.getMessage());
         }
     }
 
@@ -92,13 +98,11 @@ public class Test {
                     wrong++;
                 }
             }
-            System.out.println("Correct:" + correct + ", Wrong: " + wrong + ", Total:" + total);
             double correctRatio = ((double) correct) / total;
-            System.out.println(correctRatio);
             sum += correctRatio * correctRatio;
         }
         sum /= TIMES;
         sum = Math.sqrt(sum);
-        System.out.println("Accuracy: " + sum);
+        System.out.println("Accuracy rate: " + sum);
     }
 }

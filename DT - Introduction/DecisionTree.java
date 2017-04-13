@@ -18,7 +18,7 @@ public class DecisionTree {
     private String rootPath;
     private String introductionTrainDataPath;
     private Map<Integer, Integer> usageMap;
-    private final int MAX_USAGE = 25;
+    private final int MAX_USAGE = 30;
 
     public class HelperPair {
         public String discrete;
