@@ -97,6 +97,7 @@ public class Test {
         }
         sum /= TIMES;
         sum = Math.sqrt(sum);
-        System.out.println("Accuracy rate: " + sum);
+        sum *= 100;
+        System.out.println("Accuracy rate: " + sum + "%");
     }
 }
