@@ -5,11 +5,17 @@ import java.util.List;
  * Created by Flynn on 03/04/2017.
  */
 public class TreeNode {
+    // Which attribute this node split on
     private int attribute;
+    // If the attribute is discrete, which value goes to this node
     private String discreteValue;
+    // If the attribute is numeric, which number is used to split data set
     private double splitPoint;
+    // If the attribute is numeric, which label goes to this node (only used when constucting decision tree)
     private String splitLabel;
+    // Children nodes of this node
     private List<TreeNode> children;
+    // If this node is leaf node, which label it gives to test data
     private String label;
 
     public TreeNode() {

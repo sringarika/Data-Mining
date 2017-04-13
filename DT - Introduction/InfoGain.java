@@ -10,6 +10,7 @@ import java.util.TreeMap;
  * Created by Flynn on 04/04/2017.
  */
 public class InfoGain {
+    // Helper class
     public class NumericPair {
         public double value;
         public String label;
@@ -20,6 +21,7 @@ public class InfoGain {
         }
     }
 
+    // Helper class
     public class NumericResult {
         public double spiltPoint;
         public double EA;
@@ -32,6 +34,7 @@ public class InfoGain {
         }
     }
 
+    // Calculate sample entropy
     public double getSampleEntropy(List<Introduction> introductionList) {
         double sum = 0.0;
         Map<String, Integer> map = new HashMap<>();
@@ -53,6 +56,7 @@ public class InfoGain {
         return sum;
     }
 
+    // Form big map
     private void formBigMap(String bigMapKey, Introduction i, Map<String, Map<String, Integer>> bigMap) {
         if (!bigMap.containsKey(bigMapKey)) {
             bigMap.put(bigMapKey, new HashMap<>());
@@ -65,6 +69,7 @@ public class InfoGain {
         smallMap.put(label, smallMap.get(label) + 1);
     }
 
+    // Calculate entropy when attribute is discrete
     public double getDiscreteEntropy(int attribute, List<Introduction> introductionList) {
         double sum = 0.0;
         Map<String, Map<String, Integer>> bigMap = new HashMap<>();
@@ -108,6 +113,7 @@ public class InfoGain {
         return sum;
     }
 
+    // Calculate entropy when attribute is numeric
     public NumericResult getNumericEntropy(int attribute, List<Introduction> introductionList) {
         double sum;
         double max = (double) Integer.MIN_VALUE;
@@ -219,6 +225,7 @@ public class InfoGain {
         return new NumericResult(splitPoint, max, splitLabel);
     }
 
+    // Calculate split info
     private double getSplitInfo(int attribute, List<Introduction> introductionList) {
         double sum = 0.0;
         Map<String, Integer> map = new HashMap<>();
@@ -302,6 +309,7 @@ public class InfoGain {
         return sum;
     }
 
+    // Calculate gain ratio
     public double getGainRatio(int attribute, double ES, double EA, List<Introduction> introductionList) {
         double splitInfo = getSplitInfo(attribute, introductionList);
         double infoGain = ES - EA;

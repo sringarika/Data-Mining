@@ -17,6 +17,7 @@ public class Test {
     private static List<Selection> selectionTestData;
     private static final int TIMES = 5;
 
+    // Load data set
     public static void loadData() {
         try {
             selectionList = new ArrayList<>();
@@ -50,6 +51,7 @@ public class Test {
         }
     }
 
+    // Form training data and test data
     private static void formTrainTestData() {
         selectionTestData = new ArrayList<>();
         selectionTrainData = new ArrayList<>();
@@ -74,7 +76,7 @@ public class Test {
     public static void main(String[] args) {
         filePath = args[0];
         loadData();
-        DecisionTree dt = new DecisionTree(110);
+        DecisionTree dt = new DecisionTree(110, filePath);
         TreeNode root = new TreeNode();
         dt.constructDecisionTree(selectionList, 0, root, new HashSet<>());
         double sum = 0.0;

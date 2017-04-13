@@ -11,13 +11,13 @@ import java.io.*;
  * Created by Flynn on 04/04/2017.
  */
 public class Test {
-    // public static String rootPath = "/Users/Flynn/Desktop/eBusiness/Task 11/";
     public static String filePath;
     private static List<Introduction> introductionList;
     private static List<Introduction> trainData;
     private static List<Introduction> testData;
     private static final int TIMES = 5;
 
+    // Load data set
     public static void loadData() {
         try {
             introductionList = new ArrayList<>();
@@ -57,6 +57,7 @@ public class Test {
         }
     }
 
+    // Form training data and test data
     private static void formTrainTestData() {
         testData = new ArrayList<>();
         trainData = new ArrayList<>();
@@ -84,7 +85,7 @@ public class Test {
         double sum = 0.0;
         for (int i = 0; i < TIMES; i++) {
             formTrainTestData();
-            DecisionTree dt = new DecisionTree(50);
+            DecisionTree dt = new DecisionTree(50, filePath);
             TreeNode root = new TreeNode();
             dt.constructDecisionTree(introductionList, 0, root, new HashSet<>());
             int correct = 0, wrong = 0, total = 0;

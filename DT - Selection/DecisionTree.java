@@ -12,12 +12,14 @@ import java.util.Set;
  * Created by Flynn on 04/04/2017.
  */
 public class DecisionTree {
+    // List stores data set
     private List<Selection> selectionList;
+    // The max depth of decision tree
     private int maxDepth;
-    private double ES;
-    private String rootPath;
+    // Input file path
     private String selectionTrainDataPath;
 
+    // Helper class
     public class HelperPair {
         public String discrete;
         public double numeric;
@@ -37,35 +39,21 @@ public class DecisionTree {
         this.selectionList = selectionList;
     }
 
-    public double getES() {
-        return ES;
-    }
-
     public int getMaxDepth() {
         return maxDepth;
-    }
-
-    public void setES(double ES) {
-        this.ES = ES;
     }
 
     public void setMaxDepth(int maxDepth) {
         this.maxDepth = maxDepth;
     }
 
-    public DecisionTree() {
-        selectionList = new ArrayList<>();
-        rootPath = new String("/Users/Flynn/Desktop/eBusiness/Task 11/");
-        selectionTrainDataPath = rootPath + "trainProdSelection.arff";
-    }
-
-    public DecisionTree(int maxDepth) {
+    public DecisionTree(int maxDepth, String filePath) {
         this.maxDepth = maxDepth;
         selectionList = new ArrayList<>();
-        rootPath = new String("/Users/Flynn/Desktop/eBusiness/Task 11/");
-        selectionTrainDataPath = rootPath + "trainProdSelection.arff";
+        selectionTrainDataPath = filePath;
     }
 
+    // Load data from input file
     public void loadSelectionTrainData() {
         try {
             FileInputStream fis = new FileInputStream(selectionTrainDataPath);
@@ -97,17 +85,11 @@ public class DecisionTree {
         }
     }
 
+    // Determine when should decision tree stop growing
     private boolean shouldTerminate(int depth, List<Selection> dataSet, Set<Integer> usedAttributes) {
         if (depth >= maxDepth) {
             return true;
         }
-//        if (usedAttributes.size() == maxDepth) {
-//            return true;
-//        }
-
-//        if (dataSet.size() <= 2) {
-//            return true;
-//        }
         Set<String> set = new HashSet<>();
         for (Selection s : dataSet) {
             set.add(s.getLabel());
@@ -120,6 +102,7 @@ public class DecisionTree {
         return false;
     }
 
+    // Construct decision tree
     public void constructDecisionTree(List<Selection> selectionList, int depth, TreeNode root,
                                       Set<Integer> usedAttributes) {
         if (shouldTerminate(depth, selectionList, usedAttributes)) {
@@ -265,6 +248,7 @@ public class DecisionTree {
         }
     }
 
+    // Get the classification of a test data
     public String getClassification(TreeNode root, Selection s) {
         if (root.getLabel() != null) {
             return root.getLabel();

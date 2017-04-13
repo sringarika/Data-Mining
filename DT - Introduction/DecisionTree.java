@@ -12,14 +12,18 @@ import java.util.Set;
  * Created by Flynn on 04/04/2017.
  */
 public class DecisionTree {
+    //  List stores data set
     private List<Introduction> introductionList;
+    // The max depth of decision tree
     private int maxDepth;
-    private double ES;
-    private String rootPath;
+    // Input file path
     private String introductionTrainDataPath;
+    // Map records different attribute's usage
     private Map<Integer, Integer> usageMap;
+    // Max usage of an attribute
     private final int MAX_USAGE = 30;
 
+    // Helper class
     public class HelperPair {
         public String discrete;
         public double numeric;
@@ -39,43 +43,25 @@ public class DecisionTree {
         this.introductionList = introductionList;
     }
 
-    public double getES() {
-        return ES;
-    }
-
     public int getMaxDepth() {
         return maxDepth;
-    }
-
-    public void setES(double ES) {
-        this.ES = ES;
     }
 
     public void setMaxDepth(int maxDepth) {
         this.maxDepth = maxDepth;
     }
 
-    public DecisionTree() {
-        introductionList = new ArrayList<>();
-        usageMap = new HashMap<>();
-        rootPath = new String("/Users/Flynn/Desktop/eBusiness/Task 11/");
-        introductionTrainDataPath = rootPath + "trainProdSelection.arff";
-        for (int i = 5; i <= 8; i++) {
-            usageMap.put(i, 0);
-        }
-    }
-
-    public DecisionTree(int maxDepth) {
+    public DecisionTree(int maxDepth, String filePath) {
         this.maxDepth = maxDepth;
         usageMap = new HashMap<>();
         introductionList = new ArrayList<>();
-        rootPath = new String("/Users/Flynn/Desktop/eBusiness/Task 11/");
-        introductionTrainDataPath = rootPath + "trainProdSelection.arff";
+        introductionTrainDataPath = filePath;
         for (int i = 5; i <= 8; i++) {
             usageMap.put(i, 0);
         }
     }
 
+    // Load data from input file
     public void loadIntroductionTrainData() {
         try {
             FileInputStream fis = new FileInputStream(introductionTrainDataPath);
@@ -109,6 +95,7 @@ public class DecisionTree {
         }
     }
 
+    // Determine when should decision tree stop growing
     private boolean shouldTerminate(int depth, List<Introduction> dataSet, Set<Integer> usedAttributes) {
         if (depth >= maxDepth) {
             return true;
@@ -134,6 +121,7 @@ public class DecisionTree {
         return false;
     }
 
+    // Construct decision tree
     public void constructDecisionTree(List<Introduction> introductionList, int depth, TreeNode root,
                                       Set<Integer> usedAttributes) {
         if (shouldTerminate(depth, introductionList, usedAttributes)) {
@@ -293,6 +281,7 @@ public class DecisionTree {
         }
     }
 
+    // Get the classification of a test data
     public String getClassification(TreeNode root, Introduction i) {
         if (root.getLabel() != null) {
             return root.getLabel();

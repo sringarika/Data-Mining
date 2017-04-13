@@ -10,22 +10,7 @@ import java.util.TreeMap;
  * Created by Flynn on 04/04/2017.
  */
 public class InfoGain {
-    public class EntropyResult {
-        public String discreteSplit;
-        public double continuousSplit;
-        public double entropy;
-
-        public EntropyResult(String discreteSplit, double entropy) {
-            this.discreteSplit = discreteSplit;
-            this.entropy = entropy;
-        }
-
-        public EntropyResult(double continuousSplit, double entropy) {
-            this.continuousSplit = continuousSplit;
-            this.entropy = entropy;
-        }
-    }
-
+    // Helper class
     public class NumericPair {
         public double value;
         public String lable;
@@ -36,6 +21,7 @@ public class InfoGain {
         }
     }
 
+    // Helper class
     public class NumericResult {
         public double spiltPoint;
         public double EA;
@@ -48,13 +34,9 @@ public class InfoGain {
         }
     }
 
-//    private List<Selection> selectionList;
     public double numericSplit;
 
-//    public InfoGain(List<Selection> selectionList) {
-//        this.selectionList = selectionList;
-//    }
-
+    // Calculate sample entropy
     public double getSampleEntropy(List<Selection> selectionList) {
         double sum = 0.0;
         Map<String, Integer> map = new HashMap<>();
@@ -76,6 +58,7 @@ public class InfoGain {
         return sum;
     }
 
+    // Form big map
     private void formBigMap(String bigMapKey, Selection s, Map<String, Map<String, Integer>> bigMap) {
         if (!bigMap.containsKey(bigMapKey)) {
             bigMap.put(bigMapKey, new HashMap<>());
@@ -88,6 +71,7 @@ public class InfoGain {
         smallMap.put(label, smallMap.get(label) + 1);
     }
 
+    // Calculate entropy when attribute is discrete
     public double getDiscreteEntropy(int attribute, List<Selection> selectionList) {
         double sum = 0.0;
         Map<String, Map<String, Integer>> bigMap = new HashMap<>();
@@ -122,17 +106,7 @@ public class InfoGain {
         return sum;
     }
 
-//    public void formTreeMap(double key, Selection s, Map<Double, Map<String, Integer>> treeMap) {
-//        if (!treeMap.containsKey(key)) {
-//            treeMap.put(key, new HashMap<>());
-//        }
-//        Map<String, Integer> smallMap = treeMap.get(key);
-//        if (!smallMap.containsKey(s.getLabel())) {
-//            smallMap.put(s.getLabel(), 0);
-//        }
-//        smallMap.put(s.getLabel(), smallMap.get(s.getLabel()) + 1);
-//    }
-
+    // Calculate entropy when attribute is numeric
     public NumericResult getNumericEntropy(int attribute, List<Selection> selectionList) {
         // System.out.println(selectionList.size());
         double sum;
@@ -233,7 +207,6 @@ public class InfoGain {
                     rightSum *= ((double) (rightTotal) / selectionList.size());
 
                     sum = leftSum + rightSum;
-                    // System.out.println("leftsum: " + leftSum + " rightsum: " + rightSum);
                     if (sum > max) {
                         max = sum;
                         splitPoint = d;
@@ -243,10 +216,10 @@ public class InfoGain {
             }
         }
 
-        // System.out.println("point: " + splitPoint + " label: " + splitLabel);
         return new NumericResult(splitPoint, max, splitLabel);
     }
 
+    // Calculate split info
     private double getSplitInfo(int attribute, List<Selection> selectionList) {
         double sum = 0.0;
         Map<String, Integer> map = new HashMap<>();
@@ -314,6 +287,7 @@ public class InfoGain {
         return sum;
     }
 
+    // Calculate gain ratio
     public double getGainRatio(int attribute, double ES, double EA, List<Selection> selectionList) {
         double splitInfo = getSplitInfo(attribute, selectionList);
         double infoGain = ES - EA;
